@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <f:view contentType="text/html">
+        <h:head>
+            <title>Facelet Title</title>
+            <h:outputStylesheet name="css/jsfcrud.css"/>
+            <!--            <script type="text/javascript">
+                        function handleDrop(event, ui) {
+                            var droppedCar = ui.draggable;
+            
+                            droppedCar.fadeOut('fast');
+                        }
+                    </script>-->
+
+            <script type="text/javascript">
+                function handleDrop(event, ui) {
+                    var draggable = ui.draggable,
+                            helper = ui.helper,
+                            position = ui.position,
+                            offset = ui.offset;
+                }
+            </script> 
+        </h:head>
+        <h:body>
+
+
+            <h:form id="carForm">
+                <div align="right">
+                    <p:fieldset id="selectedCars"  style="margin-top:20px;margin-right: 263px;width: 20px; right: auto"  >
+
+
+                        <p:graphicImage id="img" value="/resources/images/carro.jpg" width="70px" height="70px" 
+                                        style="cursor:pointer;" title="Custom Options"/>  
+
+                        <p:overlayPanel id="dropArea" for="img" showEffect="blind" 
+                                        hideEffect="explode" showEvent="mouseover" hideEvent="mousedown"  
+                                        dismissable="true" showCloseIcon="true">  
+
+                            <h:outputText value="Compre agora!!!" rendered="#{empty controladorProduto.produtosNoCarrinho}" 
+                                          style="font-size:15px;" />
+                            <p:dataTable id="selectedCarsTable" var="produto" value="#{controladorProduto.produtosNoCarrinho}" 
+                                         rendered="#{not empty controladorProduto.produtosNoCarrinho}" rows="5" paginator="true">
+                                <p:column headerText="Descrição">
+                                    <h:outputText value="#{produto.nome}" />
+                                </p:column>
+
+                                <p:column headerText="Preço">
+                                    <h:outputText value="#{produto.preco}" />
+                                </p:column>
+
+
+                            </p:dataTable>
+
+
+                            <p:commandButton value="Comprar" update=":carForm:display" 
+                                             oncomplete="PF('carrinhoDialog').show()" 
+                                             icon="ui-icon-disk" />
+
+                        </p:overlayPanel> 
+                    </p:fieldset>
+                </div>
+
+                <div align="center">
+                    <p:fieldset id="availableCarsField" legend="Produtos Disponiveis!!" style="width: 800px">
+
+                        <p:dataGrid id="availableCars" var="prod" value="#{controladorProduto.listaDeProduto}" 
+                                    columns="4">
+
+                            <p:column>
+
+                                <p:panel id="pnl" header="#{prod.nome}" style="text-align:center">
+                                    <h:panelGrid columns="2" style="width:100%">
+                                        <p:outputLabel value="Descrição" for="colProd" />
+                                        <p:column id="colProd"  headerText="Produto">
+                                            <h:outputText value="#{prod.nome}" />
+                                        </p:column>
+                                        <p:outputLabel value="Preço" for="colPre" />
+                                        <p:column id="colPre" headerText="Preço">
+                                            <h:outputText value="#{prod.preco}" />
+                                        </p:column> 
+                                    </h:panelGrid>
+                                </p:panel>
+
+                                <p:draggable for="pnl" revert="true" handle=".ui-panel-titlebar" 
+                                             stack=".ui-panel"/>
+
+                            </p:column>
+
+                        </p:dataGrid>
+
+                    </p:fieldset>
+                </div>
+
+
+                <!--</p:overlayPanel>-->
+                <!--</p:outputPanel>-->
+
+                <!--</p:fieldset>-->
+
+                <p:droppable for="selectedCars" tolerance="touch" 
+                             activeStyleClass="ui-state-highlight" 
+                             datasource="availableCars" onDrop="handleDrop">
+                    <p:ajax listener="#{controladorProduto.onCarDrop}" update="dropArea availableCars" />
+                </p:droppable>
+
+                <p:dialog header="Confirmação do Pedido" widgetVar="carrinhoDialog"
+                          resizable="true" draggable="false"
+                          width="600" showEffect="fade" hideEffect="fade" modal="true">
+
+
+                    <h:panelGrid id="display" columns="2" >
+                                               
+                        <p:outputLabel value="Cliente:" for="selecionarCliente" />
+                        <p:selectOneMenu id="selecionarCliente" converter="clienteConverter"
+                                         value="#{controladorProduto.clienteSelecionado}">
+                            <f:selectItem itemLabel="Selecione um cliente" />
+                            <f:selectItems value="#{controladorProduto.clientes}"
+                                           var="cliente" itemValue="#{cliente}"
+                                           itemLabel="#{cliente.nome}" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Carrinho" for="selectedCarsTable2" />
+                        <p:dataTable id="selectedCarsTable2" var="p" 
+                                     value="#{controladorProduto.produtosNoCarrinho}" 
+                                     rendered="#{not empty controladorProduto.produtosNoCarrinho}" 
+                                     rows="5" paginator="true">
+                            <p:column headerText="Model">
+                                <h:outputText value="#{p.nome}" />
+                            </p:column>
+
+                            <p:column headerText="Preço">
+                                <h:outputText value="#{p.preco}" />
+                            </p:column>
+
+
+                        </p:dataTable> 
+
+                         
+                            <h:commandButton value="Finalizar Pedido" 
+                                             action="#{controladorProduto.comprar}"
+                                             style="margin:0"/>  
+
+
+                    </h:panelGrid>
+                </p:dialog>
+
+
+            </h:form>
+        </h:body>
+    </f:view>
+</html>
+
